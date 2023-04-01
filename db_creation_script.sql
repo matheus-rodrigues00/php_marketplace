@@ -1,3 +1,4 @@
+-- You're not require to run this. Just use it as a reference.
 DROP TABLE IF EXISTS sale_items;
 DROP TABLE IF EXISTS sales;
 DROP TABLE IF EXISTS products;

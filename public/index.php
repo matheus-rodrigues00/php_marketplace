@@ -5,7 +5,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 $router = new \Bramus\Router\Router();
 
 $router->get('/', function () {
-    return "Hello, World!";
+    echo 'Hello World!';
 });
 
 $router->run();

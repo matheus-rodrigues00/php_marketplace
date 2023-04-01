@@ -1,0 +1,39 @@
+DROP TABLE IF EXISTS sale_product_type;
+DROP TABLE IF EXISTS sale_items;
+DROP TABLE IF EXISTS sales;
+DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS product_types;
+
+CREATE TABLE products (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  price DECIMAL(10, 2) NOT NULL
+);
+
+CREATE TABLE product_types (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  tax_rate DECIMAL(10, 2) NOT NULL
+);
+
+CREATE TABLE product_type_product (
+  product_id INTEGER NOT NULL REFERENCES products(id),
+  product_type_id INTEGER NOT NULL REFERENCES product_types(id),
+  PRIMARY KEY (product_id, product_type_id)
+);
+
+CREATE TABLE sales (
+  id SERIAL PRIMARY KEY,
+  total DECIMAL(10, 2) NOT NULL,
+  total_tax DECIMAL(10, 2) NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE sale_items (
+  id SERIAL PRIMARY KEY,
+  sale_id INTEGER NOT NULL REFERENCES sales(id),
+  product_id INTEGER NOT NULL REFERENCES products(id),
+  quantity INTEGER NOT NULL,
+  price DECIMAL(10, 2) NOT NULL,
+  tax DECIMAL(10, 2) NOT NULL
+);

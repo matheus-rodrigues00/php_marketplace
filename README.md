@@ -1,14 +1,18 @@
 # Database Modeling Schema:
+
 ## products
 - id (integer, primary key, auto increment)
 - name (string)
 - price (decimal)
-- product_type_id (integer, foreign key references product_types(id))
 
 ## product_types
 - id (integer, primary key, auto increment)
 - name (string)
 - tax_rate (decimal)
+
+## product_product_type (pivot table)
+- product_id (integer, foreign key references products(id))
+- product_type_id (integer, foreign key references product_types(id))
 
 ## sales
 - id (integer, primary key, auto increment)

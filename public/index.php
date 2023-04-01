@@ -7,6 +7,7 @@ require_once __DIR__ . '/../src/controllers/ProductsController.php';
 $router = new \Bramus\Router\Router();
 $db = new Database();
 $productController = new ProductController($db);
+$productTypesController = new ProductTypesController($db);
 
 
 $router->get('/products', function () use ($productController) {
@@ -47,6 +48,45 @@ $router->delete('/products/(\d+)', function ($id) use ($productController) {
     header('Content-Type: application/json');
     echo json_encode(['message' => 'Product deleted']);
 });
+
+$router->get('/product_types', function () use ($productTypesController) {
+    $productTypes = $productTypesController->index();
+    header('Content-Type: application/json');
+    echo json_encode($productTypes);
+});
+
+$router->get('/product_types/(\d+)', function ($id) use ($productTypesController) {
+    $productType = $productTypesController->show($id);
+    echo json_encode($productType);
+});
+
+$router->post('/product_types', function () use ($productTypesController) {
+    $request_body = file_get_contents('php://input');
+    $request_data = json_decode($request_body, true);
+
+    $name = $request_data['name'];
+    $tax_rate = $request_data['tax_rate'];
+
+    $productType = $productTypesController->create($name, $tax_rate);
+    header('Content-Type: application/json');
+    echo json_encode($productType);
+});
+
+$router->put('/product_types/(\d+)', function ($id) use ($productTypesController) {
+    $request_body = json_decode(file_get_contents('php://input'), true);
+    $name = $request_body['name'] ?? null;
+    $tax_rate = $request_body['tax_rate'] ?? null;
+    $productType = $productTypesController->update($id, $name, $tax_rate);
+    header('Content-Type: application/json');
+    echo json_encode($productType);
+});
+
+$router->delete('/product_types/(\d+)', function ($id) use ($productTypesController) {
+    $productTypesController->destroy($id);
+    header('Content-Type: application/json');
+    echo json_encode(['message' => 'Product type deleted']);
+});
+
 
 $router->get('/', function () {
     echo 'Hello World!';

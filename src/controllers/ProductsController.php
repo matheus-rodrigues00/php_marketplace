@@ -36,7 +36,6 @@ class ProductController {
         }
         
         $product_data = $result[0];
-        // echo json_encode($product_data);
         $product = new Product($product_data['id'], $product_data['name'], $product_data['price']);
         return $product->getAll();
     }

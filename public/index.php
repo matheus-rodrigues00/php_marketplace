@@ -2,14 +2,14 @@
 require_once __DIR__ . '/../src/config.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../src/database.php';
-require_once __DIR__ . '/../src/controllers/ProductsController.php';
 
 $router = new \Bramus\Router\Router();
 $db = new Database();
 $productController = new ProductController($db);
 $productTypesController = new ProductTypesController($db);
+$salesController = new SalesController($db);
 
-
+// Products
 $router->get('/products', function () use ($productController) {
     $products = $productController->index();
     header('Content-Type: application/json');
@@ -54,6 +54,7 @@ $router->delete('/products/(\d+)', function ($id) use ($productController) {
     echo json_encode(['message' => 'Product deleted']);
 });
 
+// Product Types
 $router->get('/product_types', function () use ($productTypesController) {
     $productTypes = $productTypesController->index();
     header('Content-Type: application/json');
@@ -93,9 +94,65 @@ $router->delete('/product_types/(\d+)', function ($id) use ($productTypesControl
     echo json_encode(['message' => 'Product type deleted']);
 });
 
+// Sales
+$router->post('/sales', function () use ($salesController) {
+    $request_body = file_get_contents('php://input');
+    $request_data = json_decode($request_body, true);
 
+    $sale_items = $request_data['sale_items'] ?? [];
+
+    $sale = $salesController->create($sale_items);
+    header('Content-Type: application/json');
+    echo json_encode($sale);
+});
+
+$router->get('/sales/(\d+)', function ($id) use ($salesController) {
+    $sale = $salesController->show($id);
+    header('Content-Type: application/json');
+    echo json_encode($sale);
+});
+
+// Sale Items
+$router->post('/sales/items', function () use ($salesController) {
+    $request_body = file_get_contents('php://input');
+    $request_data = json_decode($request_body, true);
+    
+    $sale_id = $request_data['sale_id'];
+    $product_id = $request_data['product_id'];
+    $quantity = $request_data['quantity'];
+
+    $sale_item = $salesController->addSaleItem($sale_id, $product_id, $quantity);
+    header('Content-Type: application/json');
+    if ($sale_item == null) {
+        http_response_code(404);
+        echo json_encode(['error' => 'Sale or product not found']);
+    } else {
+        echo json_encode($sale_item);
+    }
+});
+
+$router->put('/sales/items', function () use ($salesController) {
+    $request_body = file_get_contents('php://input');
+    $request_data = json_decode($request_body, true);
+
+    $sale_item_id = $request_data['sale_item_id'];
+    $quantity = $request_data['quantity'] ?? 0;
+
+    $sale_item = $salesController->update($sale_item_id, $quantity);
+    header('Content-Type: application/json');
+    if (is_null($sale_item)) {
+        echo json_encode(['error' => 'Sale item not found']);
+    } else if($sale_item == []) {
+        http_response_code(404);
+        echo json_encode(['message' => 'Item deleted']);
+    } else {
+        echo json_encode($sale_item);
+    }
+});
+
+// Default
 $router->get('/', function () {
-    echo 'Hello World!';
+    echo 'Ok!';
 });
 
 $router->run();

@@ -40,17 +40,34 @@ class ProductTypesController {
         return $product_type->getAll();
     }
 
-    public function update($id, $name, $price) {
-        $sql = "UPDATE product_types SET name = ?, tax_rate = ? WHERE id = ?";
-        $params = [$name, $price, $id];
+    public function update($id, $name = null, $tax_rate = null) {
+        $updates = [];
+    
+        if (!is_null($name)) {
+            $updates[] = "name = '{$name}'";
+        }
+    
+        if (!is_null($tax_rate)) {
+            $updates[] = "tax_rate = '{$tax_rate}'";
+        }
+    
+        if (empty($updates)) {
+            return null;
+        }
+    
+        $updates_str = implode(', ', $updates);
+    
+        $sql = "UPDATE product_types SET {$updates_str} WHERE id = ?";
+        $params = [$id];
         $row_count = $this->db->update($sql, $params);
-
+    
         if ($row_count == 0) {
             return null;
         }
-
+    
         return $this->show($id);
     }
+    
 
     public function destroy($id) {
         $sql = "DELETE FROM product_types WHERE id = ?";

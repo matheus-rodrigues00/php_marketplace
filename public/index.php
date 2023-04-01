@@ -19,16 +19,19 @@ $router->get('/products', function () use ($productController) {
 
 $router->get('/products/(\d+)', function ($id) use ($productController) {
     $product = $productController->show($id);
+    header('Content-Type: application/json');
     echo json_encode($product);
 });
+
 $router->post('/products', function () use ($productController) {
     $request_body = file_get_contents('php://input');
     $request_data = json_decode($request_body, true);
 
     $name = $request_data['name'];
     $price = $request_data['price'];
+    $product_type_id = $request_data['product_type_id'];
 
-    $product = $productController->create($name, $price);
+    $product = $productController->create($name, $price, $product_type_id);
     header('Content-Type: application/json');
     echo json_encode($product);
 });
@@ -38,7 +41,9 @@ $router->put('/products/(\d+)', function ($id) use ($productController) {
     $request_body = json_decode(file_get_contents('php://input'), true);
     $name = $request_body['name'] ?? null;
     $price = $request_body['price'] ?? null;
-    $product = $productController->update($id, $name, $price);
+    $product_type_id = $request_body['product_type_id'] ?? null;
+    $product = $productController->update($id, $name, $price, $product_type_id);
+
     header('Content-Type: application/json');
     echo json_encode($product);
 });
@@ -57,6 +62,7 @@ $router->get('/product_types', function () use ($productTypesController) {
 
 $router->get('/product_types/(\d+)', function ($id) use ($productTypesController) {
     $productType = $productTypesController->show($id);
+    header('Content-Type: application/json');
     echo json_encode($productType);
 });
 

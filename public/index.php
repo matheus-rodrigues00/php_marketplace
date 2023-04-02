@@ -20,6 +20,7 @@ $db = new Database();
 $productController = new ProductController($db);
 $productTypesController = new ProductTypesController($db);
 $salesController = new SalesController($db);
+$usersController = new UsersController($db);
 
 // Products
 $router->get('/products', function () use ($productController) {
@@ -167,6 +168,48 @@ $router->put('/sales/items', function () use ($salesController) {
     } else {
         echo json_encode($sale_item);
     }
+});
+
+// Users
+$router->get('/users', function () use ($usersController) {
+    $users = $usersController->index();
+    header('Content-Type: application/json');
+    echo json_encode($users);
+});
+
+$router->get('/users/(\d+)', function ($id) use ($usersController) {
+    $user = $usersController->show($id);
+    header('Content-Type: application/json');
+    echo json_encode($user);
+});
+
+$router->post('/users', function () use ($usersController) {
+    $request_body = file_get_contents('php://input');
+    $request_data = json_decode($request_body, true);
+
+    $name = $request_data['name'];
+    $email = $request_data['email'];
+    $password = $request_data['password'];
+
+    $user = $usersController->create($name, $email, $password);
+    header('Content-Type: application/json');
+    echo json_encode($user);
+});
+
+$router->put('/users/(\d+)', function ($id) use ($usersController) {
+    $request_body = json_decode(file_get_contents('php://input'), true);
+    $name = $request_body['name'] ?? null;
+    $email = $request_body['email'] ?? null;
+    $password = $request_body['password'] ?? null;
+    $user = $usersController->update($id, $name, $email, $password);
+    header('Content-Type: application/json');
+    echo json_encode($user);
+});
+
+$router->delete('/users/(\d+)', function ($id) use ($usersController) {
+    $usersController->destroy($id);
+    header('Content-Type: application/json');
+    echo json_encode(['message' => 'User deleted']);
 });
 
 // Default

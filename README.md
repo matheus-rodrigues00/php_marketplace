@@ -55,6 +55,14 @@ To run the tests, go to the root directory and run:
 - total_tax (decimal)
 - created_at (timestamp)
 
+### users
+- id (integer, primary key, auto increment)
+- user_id (integer, foreign key references users(id))
+- name (string)
+- email (string, unique)
+- password (string)
+
+
 ### sale_items
 - id (integer, primary key, auto increment)
 - sale_id (integer, foreign key references sales(id))

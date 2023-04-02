@@ -183,6 +183,13 @@ $router->get('/users', function () use ($usersController) {
     echo json_encode($users);
 });
 
+// user by token
+$router->get('/users/me', function () use ($usersController) {
+    $user = $usersController->showMe();
+    header('Content-Type: application/json');
+    echo json_encode($user);
+});
+
 $router->get('/users/(\d+)', function ($id) use ($usersController) {
     $user = $usersController->show($id);
     header('Content-Type: application/json');

@@ -2,13 +2,17 @@
 
 class User {
     private $id;
-    private $username;
+    private $name;
     private $password;
+    private $token;
+    private $email;
 
-    public function __construct($id, $username, $password) {
+    public function __construct($id, $name = null, $password = null, $email = null, $token = null, ) {
         $this->id = $id;
-        $this->username = $username;
+        $this->name = $name;
         $this->password = $password;
+        $this->email = $email;
+        $this->token = $token;
 
         return $this;
     }
@@ -17,14 +21,24 @@ class User {
         return $this->id;
     }
 
-    public function getUsername() {
-        return $this->username;
+    public function getEmail() {
+        return $this->email;
+    }
+
+    public function getName() {
+        return $this->name;
+    }
+
+    public function getToken() {
+        return $this->token;
     }
 
     public function getAll() {
         return [
             'id' => $this->id,
-            'username' => $this->username,
+            'name' => $this->name,
+            'email' => $this->email,
+            'token' => $this->token,
         ];
     }
 }

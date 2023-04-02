@@ -22,6 +22,7 @@ require_once __DIR__ . '/controllers/ProductsController.php';
 require_once __DIR__ . '/controllers/ProductTypesController.php';
 require_once __DIR__ . '/controllers/UsersController.php';
 
+
 require_once __DIR__ . '/../vendor/autoload.php';
 use Bramus\Router\Router;
 

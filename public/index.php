@@ -189,7 +189,7 @@ $router->get('/users/(\d+)', function ($id) use ($usersController) {
     echo json_encode($user);
 });
 
-$router->post('/users', function () use ($usersController) {
+$router->post('/users/register', function () use ($usersController) {
     $request_body = file_get_contents('php://input');
     $request_data = json_decode($request_body, true);
 
@@ -198,6 +198,19 @@ $router->post('/users', function () use ($usersController) {
     $password = $request_data['password'];
 
     $user = $usersController->create($name, $email, $password);
+    header('Content-Type: application/json');
+    echo json_encode($user);
+});
+
+// login
+$router->post('/users/login', function () use ($usersController) {
+    $request_body = file_get_contents('php://input');
+    $request_data = json_decode($request_body, true);
+
+    $email = $request_data['email'];
+    $password = $request_data['password'];
+
+    $user = $usersController->login($email, $password);
     header('Content-Type: application/json');
     echo json_encode($user);
 });

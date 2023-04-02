@@ -1,4 +1,5 @@
 <?php
+use \Firebase\JWT\JWT;
 
 class UsersController {
     private $db;
@@ -30,6 +31,23 @@ class UsersController {
         $sale_id = $this->db->insert($sql, $params);
 
         return $this->show($user_id);
+    }
+
+    public function login($email, $password) {
+        $sql = "SELECT * FROM users WHERE email = ? AND password = ?";
+        $params = [$email, $password];
+        $result = $this->db->select($sql, $params);
+        if (count($result) == 0) {
+            return null;
+        }
+        $key = "random_secret_key_that_in_a_real_I_would_put_in_a_config_file"; 
+        
+        $data = $result[0];
+        $user = new User($data['id'], $data['name'], $data['password']);
+        $user = $user->getAll();
+        $user['exp'] = time() + 30 * 60 * 60 * 24 * 365; 
+        $user['token'] = JWT::encode($user, $key, 'HS256');
+        return $user;
     }
 
     public function show($id) {

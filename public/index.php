@@ -1,4 +1,5 @@
 <?php
+header('Access-Control-Allow-Origin: *');
 require_once __DIR__ . '/../src/config.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../src/database.php';
@@ -55,19 +56,19 @@ $router->delete('/products/(\d+)', function ($id) use ($productController) {
 });
 
 // Product Types
-$router->get('/product_types', function () use ($productTypesController) {
+$router->get('/product-types', function () use ($productTypesController) {
     $productTypes = $productTypesController->index();
     header('Content-Type: application/json');
     echo json_encode($productTypes);
 });
 
-$router->get('/product_types/(\d+)', function ($id) use ($productTypesController) {
+$router->get('/product-types/(\d+)', function ($id) use ($productTypesController) {
     $productType = $productTypesController->show($id);
     header('Content-Type: application/json');
     echo json_encode($productType);
 });
 
-$router->post('/product_types', function () use ($productTypesController) {
+$router->post('/product-types', function () use ($productTypesController) {
     $request_body = file_get_contents('php://input');
     $request_data = json_decode($request_body, true);
 
@@ -79,7 +80,7 @@ $router->post('/product_types', function () use ($productTypesController) {
     echo json_encode($productType);
 });
 
-$router->put('/product_types/(\d+)', function ($id) use ($productTypesController) {
+$router->put('/product-types/(\d+)', function ($id) use ($productTypesController) {
     $request_body = json_decode(file_get_contents('php://input'), true);
     $name = $request_body['name'] ?? null;
     $tax_rate = $request_body['tax_rate'] ?? null;
@@ -88,7 +89,7 @@ $router->put('/product_types/(\d+)', function ($id) use ($productTypesController
     echo json_encode($productType);
 });
 
-$router->delete('/product_types/(\d+)', function ($id) use ($productTypesController) {
+$router->delete('/product-types/(\d+)', function ($id) use ($productTypesController) {
     $productTypesController->destroy($id);
     header('Content-Type: application/json');
     echo json_encode(['message' => 'Product type deleted']);

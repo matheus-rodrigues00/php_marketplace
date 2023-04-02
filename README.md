@@ -10,11 +10,11 @@ This is a marketplace API, pretty much like a shopping cart.
 - DELETE /products/{id}: Deletes an existing product.
 
 ### product_types
-- GET /product_types: Returns a list of all product types.
-- POST /product_types: Creates a new product type.
-- GET /product_types/{id}: Returns the details of a single product type.
-- PUT /product_types/{id}: Updates an existing product type.
-- DELETE /product_types/{id}: Deletes an existing product type.
+- GET /product-types: Returns a list of all product types.
+- POST /product-types: Creates a new product type.
+- GET /product-types/{id}: Returns the details of a single product type.
+- PUT /product-types/{id}: Updates an existing product type.
+- DELETE /product-types/{id}: Deletes an existing product type.
 
 ### sales
 - POST /sales: Creates a new sale.

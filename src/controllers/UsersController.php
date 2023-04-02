@@ -70,6 +70,10 @@ class UsersController {
         }
     }
 
+    public function logout() {
+        return null;
+    }
+
     public function show($id) {
         $sql = "SELECT * FROM users WHERE id = ?";
         $params = [$id];

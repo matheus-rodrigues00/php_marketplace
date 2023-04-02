@@ -16,6 +16,9 @@ class ProductTypesController {
             $product_type = new ProductType($data['id'], $data['name'], $data['tax_rate']);
             $product_types[] = $product_type->getAll();
         }
+        usort($product_types, function($a, $b) {
+            return strcmp(strtolower($a['name']), strtolower($b['name']));
+        });
 
         return $product_types;
     }

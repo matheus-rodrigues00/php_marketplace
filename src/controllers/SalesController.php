@@ -10,7 +10,6 @@ class SalesController {
     public function index() {
         $sql = "SELECT * FROM sales";
         $sales = $this->db->select($sql);
-        // also get the sale items for each sale
         foreach ($sales as &$sale) {
             $sql = "SELECT * FROM sale_items WHERE sale_id = ?";
             $params = [$sale['id']];
@@ -21,7 +20,6 @@ class SalesController {
     }
 
     public function create($user_id) {
-        // Save the sale
         $sql = "INSERT INTO sales (total, total_tax, user_id) VALUES (0, 0, ?)";
         $params = [$user_id];
         $sale_id = $this->db->insert($sql, $params);
@@ -35,11 +33,11 @@ class SalesController {
         $sales = $this->db->select($sql, $params);
         // also get the sale items for each sale
         foreach ($sales as &$sale) {
-            $sql = "SELECT * FROM sale_items WHERE sale_id = ?";
-            $params = [$sale['id']];
-            $sale_items = $this->db->select($sql, $params);
-            $sale['sale_items'] = $sale_items;
+            $sale = $this->show($sale['id']);
         }
+        usort($sales, function($a, $b) {
+            return strcmp($a['created_at'], $b['created_at']);
+        });
         return $sales;
     }
 
@@ -69,6 +67,10 @@ class SalesController {
             ];
             $products[] = $sale_object;
         }
+        // sort alphabetically
+        usort($products, function($a, $b) {
+            return strcmp($a['product'], $b['product']);
+        });
         $response = [
             'id' => $sale->getId(),
             'total' => $sale->getTotal(),
@@ -113,38 +115,69 @@ class SalesController {
     }
 
     public function update($sale_item_id, $quantity) {
-        $sale_item = $this->db->select("SELECT * FROM sale_items WHERE id = ?", [$sale_item_id]);
-        if (count($sale_item) == 0) {
+        $sale_item = $this->db->select("SELECT * FROM sale_items WHERE id = ?", [$sale_item_id])[0];
+        if ($sale_item == null) {
             return null;
-        } else {
-            $sale_item = $sale_item[0];
         }
-
-        if($quantity <= 0) {
-            $this->delete($sale_item_id);
-            return [];
+    
+        $old_quantity = $sale_item['quantity'];
+        $new_quantity = $quantity;
+        if($new_quantity == $old_quantity) {
+            $sale = $this->show($sale_item['sale_id']);
+            return $sale;
         }
     
         $product = $this->db->select("SELECT * FROM products WHERE id = ?", [$sale_item['product_id']])[0];
-        $product_type = $this->db->select("SELECT * FROM product_types WHERE id = ?", [$product['product_type_id']])[0];
-        $price = $product['price'];
-        $old_quantity = $sale_item['quantity'];
-        $item_total_price = $price * $quantity;
-        $item_total_tax = $item_total_price * ($product_type['tax_rate'] / 100);
+        if ($product == null) {
+            return null;
+        }
+        
+        $product_price = $product['price'];
+        $product_type_id = $product['product_type_id'];
+        $product_type = $this->db->select("SELECT * FROM product_types WHERE id = ?", [$product_type_id])[0];
+        // avoid floating point imprecisions:
+        $product_price = round($product_price, 2);
+        $product_type['tax_rate'] = round($product_type['tax_rate'], 2);
+        $total_without_tax = $product_price * $new_quantity;
+        $total_without_tax = round($total_without_tax, 2);
+        $old_total_without_tax = $product_price * $old_quantity;
+        $old_total_without_tax = round($old_total_without_tax, 2);
+        $tax = $total_without_tax * ($product_type['tax_rate'] / 100);
+        $tax = round($tax, 2);
+        $old_tax = $old_total_without_tax * ($product_type['tax_rate'] / 100);
+        $old_tax = round($old_tax, 2);
+        $total_with_tax = $total_without_tax + $tax;
+        $total_with_tax = round($total_with_tax, 2);
+        $old_total_with_tax = $old_total_without_tax + $old_tax;
+        $old_total_with_tax = round($old_total_with_tax, 2);
     
-        $sql = "UPDATE sale_items SET quantity = ?, price = ?, tax = ? WHERE id = ?";
-        $params = [$quantity, $item_total_price, $item_total_tax, $sale_item_id];
-        $this->db->update($sql, $params);
+        $sql = "";
+        $params = [];
     
-        $sale_id = $sale_item['sale_id'];
-        $total_price_delta = ($item_total_price - ($price * $old_quantity));
-        $total_tax_delta = ($item_total_tax - ($sale_item['tax']));
-        $sql = "UPDATE sales SET total = total + ?, total_tax = total_tax + ? WHERE id = ?";
-        $params = [$total_price_delta, $total_tax_delta, $sale_id];
-        $this->db->update($sql, $params);
+        if ($new_quantity <= 0) {
+            $sql = "DELETE FROM sale_items WHERE id = ?";
+            $params = [$sale_item_id];
+            $this->db->delete($sql, $params);
     
-        $updated_sale_item = $this->db->select("SELECT * FROM sale_items WHERE id = ?", [$sale_item_id])[0];
-        return $updated_sale_item;
+            $sql = "UPDATE sales SET total = total - ?, total_tax = total_tax - ? WHERE id = ?";
+            $params = [$old_total_with_tax, $old_tax, $sale_item['sale_id']];
+            $this->db->update($sql, $params);
+        } else {
+            $sql = "UPDATE sale_items SET quantity = ?, price = ?, tax = ? WHERE id = ?";
+            $params = [$new_quantity, $total_with_tax, $tax, $sale_item_id];
+            $this->db->update($sql, $params);
+            if($new_quantity < $old_quantity) {
+                $sql = "UPDATE sales SET total = total - ?, total_tax = total_tax - ? WHERE id = ?";
+                $params = [$old_total_with_tax - $total_with_tax, $old_tax - $tax, $sale_item['sale_id']];
+                $this->db->update($sql, $params);
+            } else {
+                $sql = "UPDATE sales SET total = total + ?, total_tax = total_tax + ? WHERE id = ?";
+                $params = [$total_with_tax - $old_total_with_tax, $tax - $old_tax, $sale_item['sale_id']];
+                $this->db->update($sql, $params);
+            }
+        }
+    
+        return $this->show($sale_item['sale_id']);
     }
 
     public function delete($sale_item_id) {

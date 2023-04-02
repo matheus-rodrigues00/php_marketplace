@@ -162,18 +162,11 @@ $router->put('/sales/items', function () use ($salesController) {
     $request_data = json_decode($request_body, true);
 
     $sale_item_id = $request_data['sale_item_id'];
-    $quantity = $request_data['quantity'] ?? 0;
+    $quantity = $request_data['quantity'];
 
     $sale_item = $salesController->update($sale_item_id, $quantity);
     header('Content-Type: application/json');
-    if (is_null($sale_item)) {
-        echo json_encode(['error' => 'Sale item not found']);
-    } else if($sale_item == []) {
-        http_response_code(404);
-        echo json_encode(['message' => 'Item deleted']);
-    } else {
-        echo json_encode($sale_item);
-    }
+    echo json_encode($sale_item);
 });
 
 // Users
@@ -218,6 +211,13 @@ $router->post('/users/login', function () use ($usersController) {
     $password = $request_data['password'];
 
     $user = $usersController->login($email, $password);
+    header('Content-Type: application/json');
+    echo json_encode($user);
+});
+
+// logout
+$router->post('/logout', function () use ($usersController) {
+    $user = $usersController->logout();
     header('Content-Type: application/json');
     echo json_encode($user);
 });

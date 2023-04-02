@@ -11,11 +11,14 @@ class ProductController {
         $sql = "SELECT * FROM products";
         $result = $this->db->select($sql);
         $products = [];
-
         foreach ($result as $product_data) {
             $product = new Product($product_data['id'], $product_data['name'], $product_data['price'], $product_data['product_type_id']);
             $products[] = $product->getAll();
         }
+
+        usort($products, function($a, $b) {
+            return strcmp(strtolower($a['name']), strtolower($b['name']));
+        });
 
         return $products;
     }

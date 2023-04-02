@@ -1,5 +1,16 @@
 <?php
 header('Access-Control-Allow-Origin: *');
+header("Access-Control-Allow-Methods: HEAD, GET, POST, PUT, PATCH, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method,Access-Control-Request-Headers, Authorization");
+header('Content-Type: application/json');
+$method = $_SERVER['REQUEST_METHOD'];
+if ($method == "OPTIONS") {
+    header('Access-Control-Allow-Origin: *');
+    header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method,Access-Control-Request-Headers, Authorization");
+    header("HTTP/1.1 200 OK");
+    die();
+}
+
 require_once __DIR__ . '/../src/config.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../src/database.php';
@@ -96,6 +107,13 @@ $router->delete('/product-types/(\d+)', function ($id) use ($productTypesControl
 });
 
 // Sales
+// index
+$router->get('/sales', function () use ($salesController) {
+    $sales = $salesController->index();
+    header('Content-Type: application/json');
+    echo json_encode($sales);
+});
+
 $router->post('/sales', function () use ($salesController) {
     $request_body = file_get_contents('php://input');
     $request_data = json_decode($request_body, true);

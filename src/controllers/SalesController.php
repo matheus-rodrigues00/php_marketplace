@@ -7,6 +7,19 @@ class SalesController {
         $this->db = $db;
     }
 
+    public function index() {
+        $sql = "SELECT * FROM sales";
+        $sales = $this->db->select($sql);
+        // also get the sale items for each sale
+        foreach ($sales as &$sale) {
+            $sql = "SELECT * FROM sale_items WHERE sale_id = ?";
+            $params = [$sale['id']];
+            $sale_items = $this->db->select($sql, $params);
+            $sale['sale_items'] = $sale_items;
+        }
+        return $sales;
+    }
+
     public function create($sale_items = []) {
         // Calculate total price and tax for the sale
         $total_price = 0;
@@ -49,7 +62,6 @@ class SalesController {
         
         $data = $result[0];
         $sale = new Sale($data['id'],$data['created_at'], $data['total'], $data['total_tax']);
-
         $sql = "SELECT * FROM sale_items WHERE sale_id = ?";
         $params = [$id];
         $result = $this->db->select($sql, $params);
@@ -61,7 +73,8 @@ class SalesController {
                 'product' => $product['name'],
                 'quantity' => $data['quantity'],
                 'total' => $data['price'],
-                'tax' => $data['tax']
+                'tax' => $data['tax'],
+                'unit_price' => $product['price']
             ];
             $products[] = $sale_object;
         }

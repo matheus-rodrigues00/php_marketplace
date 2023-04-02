@@ -21,15 +21,10 @@ class User {
         return $this->username;
     }
 
-    public function getPassword() {
-        return $this->password;
-    }
-
     public function getAll() {
         return [
             'id' => $this->id,
             'username' => $this->username,
-            'password' => $this->password
         ];
     }
 }

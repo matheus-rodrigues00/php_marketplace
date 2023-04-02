@@ -138,12 +138,11 @@ class SalesController {
         $product_type = $this->db->select("SELECT * FROM product_types WHERE id = ?", [$product['product_type_id']])[0];
         $price = $product['price'];
         $old_quantity = $sale_item['quantity'];
-        $new_quantity = max(0, $quantity);
-        $item_total_price = $price * $new_quantity;
+        $item_total_price = $price * $quantity;
         $item_total_tax = $item_total_price * ($product_type['tax_rate'] / 100);
     
         $sql = "UPDATE sale_items SET quantity = ?, price = ?, tax = ? WHERE id = ?";
-        $params = [$new_quantity, $item_total_price, $item_total_tax, $sale_item_id];
+        $params = [$quantity, $item_total_price, $item_total_tax, $sale_item_id];
         $this->db->update($sql, $params);
     
         $sale_id = $sale_item['sale_id'];
@@ -152,12 +151,6 @@ class SalesController {
         $sql = "UPDATE sales SET total = total + ?, total_tax = total_tax + ? WHERE id = ?";
         $params = [$total_price_delta, $total_tax_delta, $sale_id];
         $this->db->update($sql, $params);
-    
-        if ($new_quantity == 0) {
-            $sql = "DELETE FROM sale_items WHERE id = ?";
-            $params = [$sale_item_id];
-            $this->db->delete($sql, $params);
-        }
     
         $updated_sale_item = $this->db->select("SELECT * FROM sale_items WHERE id = ?", [$sale_item_id])[0];
         return $updated_sale_item;

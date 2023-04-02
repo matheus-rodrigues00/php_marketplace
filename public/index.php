@@ -108,7 +108,6 @@ $router->delete('/product-types/(\d+)', function ($id) use ($productTypesControl
 });
 
 // Sales
-// index
 $router->get('/sales', function () use ($salesController) {
     $sales = $salesController->index();
     header('Content-Type: application/json');
@@ -119,9 +118,16 @@ $router->post('/sales', function () use ($salesController) {
     $request_body = file_get_contents('php://input');
     $request_data = json_decode($request_body, true);
 
-    $sale_items = $request_data['sale_items'] ?? [];
+    $user_id = $request_data['user_id'] ?? [];
 
-    $sale = $salesController->create($sale_items);
+    $sale = $salesController->create($user_id);
+    header('Content-Type: application/json');
+    echo json_encode($sale);
+});
+
+// get sale of the user
+$router->get('/sales/user/(\d+)', function ($user_id) use ($salesController) {
+    $sale = $salesController->showUserSales($user_id);
     header('Content-Type: application/json');
     echo json_encode($sale);
 });
@@ -211,6 +217,8 @@ $router->delete('/users/(\d+)', function ($id) use ($usersController) {
     header('Content-Type: application/json');
     echo json_encode(['message' => 'User deleted']);
 });
+
+
 
 // Default
 $router->get('/', function () {

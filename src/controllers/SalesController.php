@@ -20,36 +20,27 @@ class SalesController {
         return $sales;
     }
 
-    public function create($sale_items = []) {
-        // Calculate total price and tax for the sale
-        $total_price = 0;
-        $total_tax = 0;
-        foreach ($sale_items as $sale_item) {
-            $product = $this->db->select("SELECT * FROM products WHERE id = ?", [$sale_item['product_id']])[0];
-            $product_type = $this->db->select("SELECT * FROM product_types WHERE id = ?", [$product['product_type_id']])[0];
-            $price = $product['price'];
-            $quantity = $sale_item['quantity'];
-            $item_total_price = $price * $quantity;
-            $item_total_tax = $item_total_price * ($product_type['tax_rate'] / 100);
-            $total_price += $item_total_price;
-            $total_tax += $item_total_tax;
-        }
-
+    public function create($user_id) {
         // Save the sale
-        $sql = "INSERT INTO sales (total, total_tax) VALUES (?, ?)";
-        $params = [$total_price, $total_tax];
+        $sql = "INSERT INTO sales (total, total_tax, user_id) VALUES (0, 0, ?)";
+        $params = [$user_id];
         $sale_id = $this->db->insert($sql, $params);
 
-        // Save the sale items
-        foreach ($sale_items as $sale_item) {
-            $product_id = $sale_item['product_id'];
-            $quantity = $sale_item['quantity'];
-            $sql = "INSERT INTO sale_items (sale_id, product_id, quantity) VALUES (?, ?, ?)";
-            $params = [$sale_id, $product_id, $quantity];
-            $this->db->insert($sql, $params);
-        }
-
         return $this->show($sale_id);
+    }
+
+    public function showUserSales($user_id) {
+        $sql = "SELECT * FROM sales WHERE user_id = ?";
+        $params = [$user_id];
+        $sales = $this->db->select($sql, $params);
+        // also get the sale items for each sale
+        foreach ($sales as &$sale) {
+            $sql = "SELECT * FROM sale_items WHERE sale_id = ?";
+            $params = [$sale['id']];
+            $sale_items = $this->db->select($sql, $params);
+            $sale['sale_items'] = $sale_items;
+        }
+        return $sales;
     }
 
     public function show($id) {

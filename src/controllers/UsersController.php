@@ -22,8 +22,13 @@ class UsersController {
 
     public function create($name, $email, $password) {
         $sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
-        $params = [$name, $password, $email];
+        $params = [$name, $email, $password];
         $user_id = $this->db->insert($sql, $params);
+
+        $sql = "INSERT INTO sales (total, total_tax, user_id) VALUES (0, 0, ?)";
+        $params = [$user_id];
+        $sale_id = $this->db->insert($sql, $params);
+
         return $this->show($user_id);
     }
 

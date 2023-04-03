@@ -1,4 +1,4 @@
--- You're not require to run this. Just use it as a reference.
+-- You're not required to run this. Just wrote to demonstrate how I created the database.
 DROP TABLE IF EXISTS sale_items;
 DROP TABLE IF EXISTS sales;
 DROP TABLE IF EXISTS products;

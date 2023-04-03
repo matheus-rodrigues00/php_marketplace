@@ -1,14 +1,27 @@
 # Marketplace API
 This is a marketplace API, pretty much like a shopping cart.
 
+# How to Create the Database
+- You'll need a Postgres database called marketplace;
+- If you want to run the tests of the application you will also need a database called marketplace_test;
+- As it was instructed I generated the dump of the DB using pg_dump, you can find it on the root directory of the project;
+- In order to create the markeplace DB run:
+```
+createdb -U postgres -h localhost -p 5432 marketplace
+```
+- Then to restore the dump run:
+```
+psql -U postgres -h localhost -p 5432 -d marketplace < dump.sql
+```
+
 ## How to Run the Server (Backend)
 1. Clone the repository: git clone https://github.com/matheus-rodrigues00/php_marketplace
 2. Install the dependencies: composer install
 3. On the project root "/", start the API: php -S localhost:8000 -t public
 
 ## How to Run the Interface (Frontend)
-- Here is the project but don't worry, you don't need to clone it, https://github.com/matheus-rodrigues00/marketplace_vue;
-- The build of the frontend is already on the root directory of the project. To run do the following commands:
+- Here is the project interface but don't worry, you don't need to clone it, https://github.com/matheus-rodrigues00/marketplace_vue;
+- The build of the frontend it is already on the root directory of the project. To run do the following commands:
 ```
 npm install -g serve
 ``` 
@@ -23,12 +36,13 @@ serve -s dist
 admin@admin.com
 123456
 ```
-- On the dashboard you can take a look on the Products and ProductTypes which are the main entities of this project.
-- Briefly the ProductTypes gives the Tax Rate to the products in order to calculate the total price of the sale;
+- On the dashboard you can take a look on the Products and ProductTypes which are the main entities of this project. Briefly the ProductTypes gives the Tax Rate to the products in order to calculate the total price of the sale;
 - You can add the products on the Products tab after log in and add the products to your cart;
 - You can see your cart on the Cart tab and modify the product quantity or remove it;
 - Also you can create a new product as well as create a new Product Type which will be used to add Taxes over the products;
 - The main thing is on the cart, where you can visualize the total price of the sale and the total taxes;
+
+I have also created a Postman collection with all the endpoints, you can find it on the root directory of the project.
 
 ## Endpoints
 ### products

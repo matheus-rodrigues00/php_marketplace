@@ -1,5 +1,5 @@
 # Marketplace API
-This is a marketplace API, pretty much like a shopping cart.
+This is a marketplace API, pretty much like a shopping cart. No excuses but I did this in two weekend days, it's not perfect...
 
 # How to Create the Database
 - You'll need a Postgres database called marketplace;

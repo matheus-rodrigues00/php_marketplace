@@ -17,7 +17,7 @@ psql -U postgres -h localhost -p 5432 -d marketplace < dump.sql
 ## How to Run the Server (Backend)
 1. Clone the repository: git clone https://github.com/matheus-rodrigues00/php_marketplace
 2. Install the dependencies: composer install
-3. On the project root "/", start the API: php -S localhost:8000 -t public
+3. On the project root "/", start the API: php -S localhost:8080 -t public
 
 ## How to Run the Interface (Frontend)
 - Here is the project interface but don't worry, you don't need to clone it, https://github.com/matheus-rodrigues00/marketplace_vue;

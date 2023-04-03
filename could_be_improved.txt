@@ -1,0 +1,2 @@
+Here are a few things that could be improved if I had more time to do this project:
+1. I would hash the passwords before safe into database.

@@ -1,6 +1,35 @@
 # Marketplace API
 This is a marketplace API, pretty much like a shopping cart.
 
+## How to Run the Server (Backend)
+1. Clone the repository: git clone https://github.com/matheus-rodrigues00/php_marketplace
+2. Install the dependencies: composer install
+3. On the project root "/", start the API: php -S localhost:8000 -t public
+
+## How to Run the Interface (Frontend)
+- Here is the project but don't worry, you don't need to clone it, https://github.com/matheus-rodrigues00/marketplace_vue;
+- The build of the frontend is already on the root directory of the project. To run do the following commands:
+```
+npm install -g serve
+``` 
+```
+serve -s dist
+```
+- That's it, you can access the interface on http://localhost:3000 || http://localhost:5000 (maybe you will need to change the port if it is already in use)
+
+## How to Use
+- I've already created a user for testing but feel free to create your own: 
+```
+admin@admin.com
+123456
+```
+- On the dashboard you can take a look on the Products and ProductTypes which are the main entities of this project.
+- Briefly the ProductTypes gives the Tax Rate to the products in order to calculate the total price of the sale;
+- You can add the products on the Products tab after log in and add the products to your cart;
+- You can see your cart on the Cart tab and modify the product quantity or remove it;
+- Also you can create a new product as well as create a new Product Type which will be used to add Taxes over the products;
+- The main thing is on the cart, where you can visualize the total price of the sale and the total taxes;
+
 ## Endpoints
 ### products
 - GET /products: Returns a list of all products.
@@ -24,13 +53,9 @@ This is a marketplace API, pretty much like a shopping cart.
 - POST /sales/items: Adds a new item to a sale.
 - PUT /sales/items: Updates an existing item in a sale.
 
-## Installation
-1. Clone the repository: git clone https://github.com/matheus-rodrigues00/php_marketplace
-2. Install the dependencies: composer install
-3. Start the API: php -S localhost:8000 -t public
-
 ## Testing
-To run the tests, go to the root directory and run:
+- To run the tests you need to create a database called **marketplace_test**. to isolate the test enviroment.
+- Go to the root directory and run:
 ```php vendor/bin/phpunit tests/```
 
 ## Dependencies
